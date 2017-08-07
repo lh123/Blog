@@ -1,6 +1,8 @@
+"use strict"
+
 var express = require("express");
 var Article = require("../../models/article");
-var ApiError = require("../apierror");
+var utils = require("../../utils/index");
 var tokenVerify = require("../../middleware/tokenVerify");
 
 var router = express.Router();
@@ -8,175 +10,197 @@ var router = express.Router();
 // title: { type: String, required: true },
 // user: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 // content: { type: String },
+// summary: { type: String },
 // tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "tag" }],
 // createTime: { type: Date, default: Date.now() },
-// lastModify: { type: Date },
-// hidden: { type: Boolean },
-// visits: { type: Number, default: 0 }
+// lastModify: { type: Date, default: Date.now() },
+// hidden: { type: Boolean, default: false },
+// visits: { type: Number, default: 0 },
 
-router.post("/saveArticle", tokenVerify, function (req, res) {
+router.post("/createArticle", tokenVerify, function (req, res) {
     var title = req.body.title;
     var user = req.body.user._id;
     var content = req.body.content;
-    var tags = req.body.tags;
+    var summary = req.body.summary;
+    var tags = [];
+    if (req.body.tags) {
+        req.body.tags.forEach(value => tags.push(value));
+    }
+    var createTime = Date.now();
+    var lastModify = Date.now();
     var hidden = req.body.hidden;
-    var isDraft = req.body.isDraft;
+    var visits = 0;
     if (!title) {
-        return res.json({
-            code: 400,
-            msg: "标题不能为空"
-        });
+        utils.sendError(res, 400, "标题不能为空");
+    }
+    if (!(hidden === true || hidden === false)) {
+        utils.sendError(res, 400, "hidden字段错误");
     }
     if (!content) {
-        return res.json({
-            code: 400,
-            msg: "内容不能为空"
-        });
+        utils.sendError(res, 400, "文章内容不能为空");
     }
-    var article = new Article({ title, user, content, tags, hidden, isDraft });
-    article.save()
-        .then((article) => {
-            res.json({ code: 0, msg: "success", data: article.toObject() });
-        })
-        .catch((err) => {
-            res.json({ code: 500, msg: err.message });
-        });
+    const article = new Article({
+        title,
+        user,
+        content,
+        summary,
+        tags,
+        createTime,
+        lastModify,
+        hidden,
+        visits
+    });
+    article.save().catch(err => utils.sendError(500, "内部错误"))
+        .then(result => utils.sendSuccess(res, { id: result._id }));
 });
 
 router.get("/articleList", function (req, res) {
-    /**
-     * @query tag  搜索包含指定标签的文章
-     * @param page 文章列表页码 从1开始
-     * @param limit 每页文章数量
-     * */
     var tag = req.query.tag;
-    var page = req.query.page || 0;
-    var limit = req.query.limit || 10;
-    var skip = limit * page;
-    var query;
-    if (tag === undefined) {
-        query = Article.find({ hidden: false });
-    } else {
-        query = Article.find({ hidden: false, tags: { $all: tag } });
-    }
-    return query.skip(skip).limit(limit)
-        .select("title tags lastModify visits isDraft").exec()
-        .then(articles => {
-            var results = [];
-            articles.forEach(a => {
-                results.push(a.toObject());
-            });
-            res.json({
-                code: 0,
-                msg: "success",
-                data: {
-                    articles: results,
-                    count: results.length
+    if (undefined !== tag) {
+        Article.find({
+            hidden: false,
+            tags: { "$all": [tag] }
+        }).select("title summary tags createTime lastModify visits")
+            .populate("tags")
+            .sort({ createTime: -1 })
+            .exec().catch(err => utils.sendError(res, 500, "内部错误"))
+            .then(arrs => {
+                let articleArr = [];
+                if (arrs.length > 0) {
+                    arrs.forEach(value => articleArr.push(value.toObject()));
+                    utils.sendSuccess(res, articleArr);
                 }
             });
-        })
-        .catch(err => {
-            res.json({
-                code: 500,
-                msg: err.message
+    } else {
+        const limit = req.query.limit || 10;
+        const page = req.query.page || 0;
+        let skip = page * limit;
+        let articleArr = [];
+        Article.find({ hidden: false }).select("title summary tags createTime lastModify visits")
+            .populate("tags")
+            .sort({ createTime: -1 })
+            .limit(limit).skip(skip).exec().catch(err => Promise.reject(utils.ApiError(500, "内部错误")))
+            .then(articles => {
+                articles.forEach(value => articleArr.push(value.toObject()));
+                return Article.count().exec().catch(err => Promise.reject(utils.ApiError(500, "内部错误")));
+            })
+            .then(num => {
+                utils.sendSuccess(res, { articles: articleArr, total: num });
+            })
+            .catch(err => {
+                utils.sendError(res, err);
             });
-        });
+    }
 });
 
 router.get("/articleDetail", function (req, res) {
-    var id = req.query.id;
-    if (!id) {
-        return res.json({ msg: "id不能为空" });
-    }
-    return Article.findById(id).select("title content user tags lastModify visits isDraft")
-        .populate("user", "username")
-        .populate("tags")
-        .exec()
+    const id = req.query.id;
+    // if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    //     return utils.sendError(res, 400, "id字段错误");
+    // }
+    Article.findOne({ _id: id, hidden: false })
+        .select("title content summary tags createTime lastModify visits")
+        .populate("tags").exec().catch(err => Promise.reject(utils.ApiError(500, "内部错误")))
         .then(article => {
             if (article) {
-                var obj = article.toObject();
-                res.json({
-                    code: 0,
-                    msg: "success",
-                    data: obj
-                });
-            } else {
-                res.json({
-                    code: 400,
-                    msg: "文章不存在"
+                article = article.toObject();
+                var nextArticle;
+                var preArticle;
+                return new Promise(function (resolve, reject) {
+                    Promise.all([
+                        Article.findOne({ _id: { "$gt": article._id }, hidden: false }).select("title _id")
+                            .catch(err => Promise.reject(utils.ApiError(500, "内部错误")))
+                            .then(next => nextArticle = next.toObject()),
+                        Article.findOne({ _id: { "$lt": article._id }, hidden: false }).sort({ _id: -1 }).select("title _id")
+                            .catch(err => Promise.reject(utils.ApiError(500, "内部错误")))
+                            .then(pre => preArticle = pre.toObject()),
+                    ]).catch(err => reject(err))
+                        .then(() => {
+                            var articleDetail = {
+                                article,
+                                nextArticle,
+                                preArticle
+                            }
+                            resolve(articleDetail);
+                        });
                 });
             }
         })
-        .catch(err => {
-            res.json({
-                msg: err.message
-            });
-        })
-});
-
-router.get("/deleteArticle", tokenVerify, function (req, res) {
-    var id = req.query.id;
-    if (!id) {
-        return res.json({ code: 400, msg: "id不能为空" });
-    }
-    Article.findByIdAndRemove(id).exec()
-        .then((data) => {
-            if (data) {
-                res.json({ code: 0, msg: "success" });
-            } else {
-                return Promise.reject(new ApiError(400, "id不存在"));
-            }
-        })
-        .catch(err => {
-            res.json({ code: err.code || 500, msg: err.message });
-        });
+        .then(articleDetail => utils.sendSuccess(res, articleDetail))
+        .catch(err => utils.sendError(res, err));
 });
 
 router.post("/modifyArticle", tokenVerify, function (req, res) {
-    var id = req.query.id;
+    const id = req.query.id;
     var title = req.body.title;
     var content = req.body.content;
-    var tags = req.body.tags;
+    var summary = req.body.summary;
+    var tags = [];
+    if (req.body.tags) {
+        req.body.tags.forEach(value => tags.push(value));
+    }
+    var lastModify = Date.now();
     var hidden = req.body.hidden;
-    var isDraft = req.body.isDraft;
-    if (!id) {
-        return res.json({ code: 400, msg: "id不能为空" });
+    var modifyOpt = {
+        "$set": {
+            title, content, summary, tags, lastModify, hidden
+        }
     }
-    var obj = {
-        id, title, content, tags, hidden, isDraft
+    for(key in modifyOpt["$set"]){
+        if(modifyOpt["$set"][key] === undefined){
+            delete modifyOpt["$set"][key];
+        }
     }
-    obj.lastModify = Date.now();
-    Article.findById(id).exec()
+    Article.findOneAndUpdate({ _id: id }, modifyOpt, { new: true }).exec()
         .catch(err => {
             if (err.name === "CastError") {
-                return Promise.reject(new ApiError(400, "id不存在"));
+                return Promise.reject(utils.ApiError(400, "id不存在"));
             } else {
-                return Promise.reject(new ApiError(500, "内部错误"));
+                return Promise.reject(utils.ApiError(500, "内部错误"));
             }
         })
         .then(article => {
-            if (!article.isDraft && isDraft) {
-                return Promise.reject(new ApiError(400, "修改失败:文章已发布"));
-            } else {
-                return Article.findByIdAndUpdate(id, { $set: obj }).exec();
-            }
+            article = article.toObject();
+            utils.sendSuccess(res, article);
         })
-        .then(data => {
-            if (data) {
-                res.json({
-                    code: 0,
-                    msg: "success"
-                });
-            } else {
-                return Promise.reject(new ApiError(400, "id不存在"));
-            }
+        .catch(err => utils.sendError(res, err));
+});
+
+router.get("/hiddenArticleList", tokenVerify, function (req, res) {
+    const limit = req.query.limit || 10;
+    const page = req.query.page || 0;
+    let skip = page * limit;
+    let articleArr = [];
+    Article.find({ hidden: true }).select("title summary tags createTime lastModify visits")
+        .populate("tags")
+        .sort({ createTime: -1 })
+        .limit(limit).skip(skip).exec().catch(err => Promise.reject(utils.ApiError(500, "内部错误")))
+        .then(articles => {
+            articles.forEach(value => articleArr.push(value.toObject()));
+            return Article.count().exec().catch(err => Promise.reject(utils.ApiError(500, "内部错误")));
+        })
+        .then(num => {
+            utils.sendSuccess(res, { articles: articleArr, total: num });
         })
         .catch(err => {
-            res.json({
-                code: err.code,
-                msg: err.message
-            });
+            utils.sendError(res, err);
         });
+});
+
+router.get("/hiddenArticleDetail", tokenVerify, function (req, res) {
+    const id = req.query.id;
+    Article.findOne({ _id: id, hidden: true })
+        .select("title content summary tags createTime lastModify visits")
+        .populate("tags").exec().catch(err => Promise.reject(utils.ApiError(500, "内部错误")))
+        .then(article => {
+            if (article) {
+                return Promise.resolve(article.toObject());
+            } else {
+                return Promise.reject(utils.ApiError(400, "id不存在"));
+            }
+        })
+        .then(articleDetail => utils.sendSuccess(res, articleDetail))
+        .catch(err => utils.sendError(res, err));
 });
 
 module.exports = router;

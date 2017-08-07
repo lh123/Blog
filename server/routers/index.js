@@ -11,6 +11,8 @@ router.get("/",function(req,res){
 // router.use("/api",tokenVerify);
 router.use("/oauth",require("./oauth/oauth"));
 router.use("/api",require("./api/article"));
+router.use("/api",require("./api/draft"));
+router.use("/api",require("./api/publish"));
 router.use("/api",require("./api/tag"));
 router.use("/api",require("./api/blog"));
 
