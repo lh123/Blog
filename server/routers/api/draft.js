@@ -47,7 +47,7 @@ router.get("/draftsList", tokenVerify, function (req, res) {
     var tag = req.query.tag;
     var queryOpt = {};
     if (undefined !== tag) {
-        queryOpt = { "$all": [tag] };
+        queryOpt = { tags: { "$all": [tag] } };
     }
     Draft.find(queryOpt).select("title user summary tags createTime lastModify article isPublish")
         .populate("tags")
@@ -91,6 +91,7 @@ router.post("/modifyDraft", tokenVerify, function (req, res) {
     var title = req.body.title;
     var content = req.body.content;
     var user = req.body.user._id;
+    var tags = req.body.tags;
     var summary = "";
     if (content) {
         let contentArr = content.split("<!-- more -->");
@@ -103,13 +104,14 @@ router.post("/modifyDraft", tokenVerify, function (req, res) {
     var modifyOpt = {
         title,
         content,
+        tags,
         user,
         summary,
         lastModify,
         isPublish
     };
-    for(key in modifyOpt){
-        if(modifyOpt[key] === undefined){
+    for (key in modifyOpt) {
+        if (modifyOpt[key] === undefined) {
             delete modifyOpt[key];
         }
     }
@@ -137,10 +139,10 @@ router.post("/deleteDraft", tokenVerify, function (req, res) {
     Draft.findOne({ _id: id })
         .select("article").exec().catch(err => Promise.reject(new ApiError(500, "内部错误")))
         .then(draft => {
-            if (null === draft) {
+            if (!draft) {
                 return Promise.reject(new ApiError(400, "id不存在"));
             }
-            if (null !== draft.article) {
+            if (draft.article) {
                 return Promise.reject(new ApiError(400, "已发布的草稿无法删除"));
             }
             return Draft.remove({ _id: id }).exec().catch(err => Promise.reject(new ApiError(500, "内部错误")));

@@ -14,7 +14,7 @@
                 </li>
             </ul>
         </div>
-        <div class="article-view-container">
+        <div class="posts-view-container">
             <router-view></router-view>
         </div>
     </div>
@@ -37,7 +37,7 @@ export default {
                 .catch(err => this.$message({ message: err.message, type: "error" }));
         },
         onTagClick: function (id) {
-            this.$router.push({ path: "/tags/articles", query: { tagId: id } });
+            this.$router.push({ path: "/tags/posts", query: { tagId: id } });
         },
         addTag: function () {
             this.$prompt('请输入标签名', '提示', { confirmButtonText: '确定', cancelButtonText: '取消' })
@@ -140,5 +140,10 @@ export default {
     position: absolute;
     right: 0px;
     top: 12px;
+}
+
+.posts-view-container{
+    display: inline-block;
+    vertical-align: top;
 }
 </style>

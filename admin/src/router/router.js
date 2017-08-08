@@ -1,8 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import ArticleList from "../components/ArticleList.vue";
-import ArticlePreview from "../components/ArticlePreview.vue";
-import ArticleEdit from "../components/ArticleEdit.vue";
+import PostList from "../components/PostList.vue";
+import PostEdit from "../components/PostEdit.vue";
 import TagList from "../components/Taglist.vue";
 import Login from "../components/Login.vue";
 import UserCenter from "../components/UserCenter.vue";
@@ -17,15 +16,14 @@ var isRefeshToken = false;
 const router = new VueRouter({
     routes: [
         {
-            path: "/", redirect: "/articles"
+            path: "/", redirect: "/posts"
         },
         {
-            path: "/articles", component: ArticleList, meta: {
+            path: "/posts", component: PostList, meta: {
                 auth: true
             },
             children: [
-                { path: "preview", component: ArticlePreview, meta: { auth: true } },
-                { path: "edit", component: ArticleEdit, meta: { auth: true } }
+                { path: "edit", component: PostEdit, meta: { auth: true } }
             ]
         },
         {
@@ -33,7 +31,7 @@ const router = new VueRouter({
                 auth: true
             },
             children: [
-                { path: "articles", component: ArticleList }
+                { path: "posts", component: PostList }
             ]
         },
         {

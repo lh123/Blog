@@ -1,9 +1,9 @@
 <template>
-    <div class="article-edit-wrapper">
-        <div class="article-edit-title">
-            <input type="text" v-model="articleTitle" placeholder="请输入标题">
+    <div class="post-edit-wrapper">
+        <div class="post-edit-title">
+            <input type="text" v-model="postTitle" placeholder="请输入标题">
         </div>
-        <div class="article-toolbar">
+        <div class="post-toolbar">
             <div class="tags">
                 <el-dropdown @command="onTagClick" trigger="click">
                     <span class="el-dropdown-link">
@@ -18,9 +18,9 @@
                 </el-tag>
             </div>
             <div class="action-btn">
-                <el-button type="danger" size="small" @click="delectArticles">删除</el-button>
+                <el-button type="danger" size="small" @click="deleteDraft">删除</el-button>
                 <el-button size="small" @click="saveDraft">保存草稿</el-button>
-                <el-button type="primary" size="small" @click="publishedArticles">发布文章</el-button>
+                <el-button type="primary" size="small" @click="publishedDraft">发布文章</el-button>
             </div>
         </div>
         <div class="editor-container">
@@ -34,59 +34,67 @@ import SimpleMDE from "simplemde";
 import axios from "axios";
 import "../assets/css/simplemde.min.css";
 import marked from "marked";
-import ArticleApi from "../api/article";
+import DraftApi from "../api/draft";
 import TagApi from "../api/tag";
 
 export default {
     data: function () {
         return {
             id: undefined,
-            articleTitle: "",
+            postTitle: "",
             content: "",
             tags: [],
             allTags: [],
-            isPublic: false
+            isPublic: false,
+            simplemde: null
+        }
+    },
+    watch: {
+        "$route": function (to, from) {
+            if (to.path === from.path && to.query.id !== from.query.id) {
+                this.fetchData();
+            }
         }
     },
     mounted: function () {
+        var self = this;
+        this.simplemde = new SimpleMDE({
+            element: document.getElementById("editor"),
+            autofocus: true,
+            autosave: true,
+            previewRender: function (text) {
+                return marked(text);
+            }
+        });
+        this.simplemde.codemirror.on("change", function () {
+            var value = self.simplemde.value();
+            self.content = value;
+        });
         this.fetchData();
     },
     methods: {
         fetchData: function () {
-            var self = this;
-            self.id = this.$route.query.id;
-            var simplemde = new SimpleMDE({
-                element: document.getElementById("editor"),
-                autofocus: true,
-                autosave: true,
-                previewRender: function (text) {
-                    return marked(text);
-                }
-            });
-            simplemde.codemirror.on("change", function () {
-                var value = simplemde.value();
-                self.content = value;
-            });
+            this.id = this.$route.query.id;
             TagApi.getTags()
                 .then(tags => this.allTags = tags)
                 .catch(err => this.$message({ message: err.message, type: "error" }));
-            if (self.id) {
-                ArticleApi.getArticleDetail(self.id)
+            if (this.id) {
+                DraftApi.getDraftDetail(this.id)
                     .then(res => {
-                        this.articleTitle = res.title;
+                        this.postTitle = res.title;
                         this.content = res.content;
                         this.isPublic = res.isPublic;
                         this.tags = res.tags;
-                        simplemde.value(this.content);
+                        this.simplemde.value(this.content);
                     })
                     .catch(err => this.$message({ message: err.message, type: "error" }));
             } else {
                 this.id = undefined;
-                this.articleTitle = "";
+                this.postTitle = "";
                 this.content = "";
                 this.isPublic = false;
                 this.tags = [];
-                simplemde.value(this.content);
+                this.simplemde.value(this.content);
             }
         },
         onTagClick: function (tag) {
@@ -98,36 +106,34 @@ export default {
             var index = this.tags.findIndex(value => value._id === tag._id);
             this.tags.splice(index, 1);
         },
-        delectArticles: function () {
-            ArticleApi.deleteArticle(this.id)
+        deleteDraft: function () {
+            DraftApi.deleteDraft(this.id)
                 .then(() => {
                     this.$message({ message: "成功删除文章", type: "success" });
-                    this.$emit("onArticleDelete");
-                    this.$router.push("/articles");
+                    this.$emit("onDraftDelete");
+                    this.$router.push("/posts");
                 })
                 .catch(err => {
                     this.$message({ message: err.message, type: "error" });
                 })
         },
         saveDraft: function () {
-            ArticleApi.saveArticle(this.id, this.articleTitle, this.content, this.tags, false, true)
-                .then(() => {
-                    this.$message({ message: "成功保存草稿", type: "success" });
-                    this.$emit("onDraftSave");
-                })
-                .catch(err => {
-                    this.$message({ message: err.message, type: "error" });
-                });
+            if (this.id) {
+                DraftApi.saveDraft(this.id, this.postTitle, this.content, this.tags)
+                    .then(() => {
+                        this.$message({ message: "成功保存草稿", type: "success" });
+                        this.$emit("onDraftSave");
+                    })
+                    .catch(err => {
+                        this.$message({ message: err.message, type: "error" });
+                    });
+            }
         },
-        publishedArticles: function () {
-            ArticleApi.saveArticle(this.id, this.articleTitle, this.content, this.tags, false, false)
+        publishedDraft: function () {
+            DraftApi.publishDraft(this.id)
                 .then(data => {
-                    if (data) {
-                        this.id = data._id;
-                    }
                     this.$message({ message: "成功发布文章", type: "success" });
-                    this.$router.push({ path: "/articles/edit", query: { id: this.id } });
-                    this.$emit("onArticleSave");
+                    this.$emit("onDraftPublish");
                 })
                 .catch(err => {
                     this.$message({ message: err.message, type: "error" });
@@ -138,12 +144,12 @@ export default {
 </script>
 
 <style>
-.article-edit-title {
+.post-edit-title {
     height: 43px;
     width: 100%;
 }
 
-.article-edit-title>input {
+.post-edit-title>input {
     height: 43px;
     width: 90%;
     margin-left: 10px;
@@ -152,12 +158,12 @@ export default {
     border: none;
 }
 
-.article-edit-wrapper {
+.post-edit-wrapper {
     height: 100%;
     width: 100%;
 }
 
-.article-toolbar {
+.post-toolbar {
     height: 60px;
     line-height: 60px;
 }
@@ -176,11 +182,11 @@ export default {
     margin: 5px;
 }
 
-.article-toolbar .tags {
+.post-toolbar .tags {
     display: inline-block;
 }
 
-.article-toolbar .action-btn {
+.post-toolbar .action-btn {
     float: right;
     padding-right: 20px;
 }
