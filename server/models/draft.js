@@ -6,7 +6,7 @@ var draftScheme = new mongoose.Schema({
     content: { type: String },
     summary: { type: String },
     tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "tag" }],
-    createTime: { type: Date, default: Date.now() },
+    createTime: { type: Date },
     lastModify: { type: Date, default: Date.now() },
     article: { type: mongoose.Schema.Types.ObjectId, ref: "article" },
     isPublish: { type: Boolean }

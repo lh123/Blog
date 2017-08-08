@@ -1,5 +1,7 @@
 body {
+    font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
     margin: 0px;
+    font-size: 15px;
 }
 
 a {
@@ -9,4 +11,13 @@ a {
 
 img {
     border: none;
+}
+
+h1, h2, h3, h4, strong {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+p {
+    word-spacing: 0.05em;
 }

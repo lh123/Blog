@@ -72,7 +72,7 @@ router.get("/articleList", function (req, res) {
                 }
             });
     } else {
-        const limit = req.query.limit || 10;
+        const limit = parseInt(req.query.limit || 10);
         const page = req.query.page || 0;
         let skip = page * limit;
         let articleArr = [];
@@ -109,11 +109,19 @@ router.get("/articleDetail", function (req, res) {
                 return new Promise(function (resolve, reject) {
                     Promise.all([
                         Article.findOne({ _id: { "$gt": article._id }, hidden: false }).select("title _id")
-                            .catch(err => Promise.reject(utils.ApiError(500, "内部错误")))
-                            .then(next => nextArticle = next.toObject()),
+                            .catch(err => {
+                                Promise.reject(utils.ApiError(500, "内部错误"))
+                            })
+                            .then(next => {
+                                preArticle = next ? next.toObject() : null;
+                            }),
                         Article.findOne({ _id: { "$lt": article._id }, hidden: false }).sort({ _id: -1 }).select("title _id")
-                            .catch(err => Promise.reject(utils.ApiError(500, "内部错误")))
-                            .then(pre => preArticle = pre.toObject()),
+                            .catch(err => {
+                                Promise.reject(utils.ApiError(500, "内部错误"))
+                            })
+                            .then(pre => {
+                                nextArticle = pre ? pre.toObject() : null;
+                            }),
                     ]).catch(err => reject(err))
                         .then(() => {
                             var articleDetail = {
@@ -146,8 +154,8 @@ router.post("/modifyArticle", tokenVerify, function (req, res) {
             title, content, summary, tags, lastModify, hidden
         }
     }
-    for(key in modifyOpt["$set"]){
-        if(modifyOpt["$set"][key] === undefined){
+    for (key in modifyOpt["$set"]) {
+        if (modifyOpt["$set"][key] === undefined) {
             delete modifyOpt["$set"][key];
         }
     }

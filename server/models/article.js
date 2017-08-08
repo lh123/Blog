@@ -6,7 +6,7 @@ var articleScheme = new mongoose.Schema({
     content: { type: String },
     summary: { type: String },
     tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "tag" }],
-    createTime: { type: Date, default: Date.now() },
+    createTime: { type: Date },
     lastModify: { type: Date, default: Date.now() },
     hidden: { type: Boolean, default: false },
     visits: { type: Number, default: 0 },

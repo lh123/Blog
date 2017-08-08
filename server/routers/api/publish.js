@@ -68,6 +68,7 @@ router.post("/publish", tokenVerify, function (req, res) {
                 const articleOption = {
                     title: draft.title,
                     user: draft.user,
+                    createTime: Date.now(),
                     content: draft.content,
                     summary: draft.summary,
                     tags: draft.tags,
