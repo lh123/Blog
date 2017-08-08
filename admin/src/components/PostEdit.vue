@@ -32,10 +32,19 @@
 <script>
 import SimpleMDE from "simplemde";
 import axios from "axios";
-import "../assets/css/simplemde.min.css";
 import marked from "marked";
 import DraftApi from "../api/draft";
 import TagApi from "../api/tag";
+import highlight from "highlight.js";
+import "highlight.js/styles/github.css";
+import "../assets/css/simplemde.css";
+import "../assets/css/markdown.css";
+
+marked.setOptions({
+  highlight: function (code) {
+    return highlight.highlightAuto(code).value;
+  }
+});
 
 export default {
     data: function () {
@@ -62,6 +71,7 @@ export default {
             element: document.getElementById("editor"),
             autofocus: true,
             autosave: true,
+            spellChecker: false,
             previewRender: function (text) {
                 return marked(text);
             }

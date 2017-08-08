@@ -35,6 +35,10 @@ export default {
     },
     watch: {
         "$route": function (to, from) {
+            var regr = to.fullPath.match(/\/posts\/\w{0,}\?(\w*=\w*)/);
+            if (regr && regr[1]) {
+                this.currentDraftId = regr[1].split("=")[1];
+            }
             if (to.path === from.path && to.query.tagId !== from.query.tagId) {
                 this.fetchData();
             }
@@ -43,6 +47,10 @@ export default {
     ,
     methods: {
         fetchData: function () {
+            var regr = this.$route.fullPath.match(/\/posts\/\w{0,}\?(\w*=\w*)/);
+            if (regr && regr[1]) {
+                this.currentDraftId = regr[1].split("=")[1];
+            }
             DraftApi.getDraftList(this.$route.query.tagId)
                 .then(data => {
                     this.draftList = data;
@@ -68,15 +76,14 @@ export default {
             return `${year}-${month}-${day} ${hour}:${min}:${sec}`;
         },
         onDraftClick: function (id) {
-            this.currentDraftId = id;
-            console.log(this.$route);
+            // this.currentDraftId = id;
             this.$router.push({ path: "/posts/edit", query: { id } });
         },
         addPost: function () {
             DraftApi.createDraft("请输入标题")
                 .then((draft) => {
                     let id = draft._id;
-                    this.currentDraftId = draft._id;
+                    // this.currentDraftId = draft._id;
                     this.$router.push({ path: "/posts/edit", query: { id } });
                     this.fetchData();
                 })

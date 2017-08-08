@@ -8,13 +8,13 @@
                 </a>
                 <ul class="nav-item-container">
                     <li class="nav-link-item">
-                        <a class="nav-link">文章</a>
+                        <router-link to="/posts" class="nav-link">文章</router-link>
                     </li>
                     <li class="nav-link-item">
-                        <a class="nav-link">标签</a>
+                        <router-link to="/tags" class="nav-link">标签</router-link>
                     </li>
                     <li class="nav-link-item">
-                        <a class="nav-link">关于我</a>
+                        <router-link to="/about" class="nav-link">关于我</router-link>
                     </li>
                 </ul>
             </nav>
@@ -76,6 +76,10 @@ export default {
 }
 
 .nav-link-item>a:hover {
+    border-bottom: 3px solid #42b983;
+}
+
+.nav-link.router-link-active {
     border-bottom: 3px solid #42b983;
 }
 </style>

@@ -6,7 +6,7 @@
             </h2>
             <h4>{{post.createTime | dateFormate}}</h4>
             <div>
-                <p v-html="post.summary"></p>
+                <p v-html="markdown(post.summary)"></p>
             </div>
             <router-link :to="'/posts/' + post._id">... continue reading</router-link>
         </div>
@@ -17,6 +17,7 @@
 <script>
 import ArticleApi from "../api/article";
 import PageNav from "./common/PageNav.vue";
+import marked from "marked";
 
 const limit = 10;
 
@@ -52,6 +53,9 @@ export default {
                 .catch(msg => {
                     alert(msg);
                 })
+        },
+        markdown: function (content) {
+            return marked(content || "");
         },
         prePage: function () {
             var prePage = this.currentPage - 1;
