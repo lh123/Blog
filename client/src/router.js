@@ -3,10 +3,12 @@ import Vue from "vue";
 
 import PostList from "./components/PostList.vue";
 import PostDetail from "./components/PostDetail.vue";
+import TagList from "./components/TagList.vue";
 
 Vue.use(VueRouter);
 
 const router = new VueRouter({
+    linkActiveClass:"active",
     routes: [
         {
             path: "/", redirect: "/posts"
@@ -16,6 +18,9 @@ const router = new VueRouter({
         },
         {
             path:"/posts/:id", component: PostDetail
+        },
+        {
+            path: "/tags", component: TagList
         }
     ]
 });

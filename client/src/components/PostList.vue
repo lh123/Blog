@@ -4,8 +4,8 @@
             <h2>
                 <router-link :to="'/posts/' + post._id">{{post.title}}</router-link>
             </h2>
-            <h4>{{post.createTime | dateFormate}}</h4>
-            <div>
+            <h4>{{post.createTime | dateFormat}}</h4>
+            <div class="markdown">
                 <p v-html="markdown(post.summary)"></p>
             </div>
             <router-link :to="'/posts/' + post._id">... continue reading</router-link>
@@ -17,7 +17,7 @@
 <script>
 import ArticleApi from "../api/article";
 import PageNav from "./common/PageNav.vue";
-import marked from "marked";
+import { markdown, dateFormat } from "../utils/index";
 
 const limit = 10;
 
@@ -54,9 +54,7 @@ export default {
                     alert(msg);
                 })
         },
-        markdown: function (content) {
-            return marked(content || "");
-        },
+        markdown,
         prePage: function () {
             var prePage = this.currentPage - 1;
             this.$router.push({ path: "/posts", query: { page: prePage } });
@@ -67,22 +65,7 @@ export default {
         }
     },
     filters: {
-        dateFormate: function (value) {
-            var format = function (bit) {
-                if (bit < 10) {
-                    return "0" + bit;
-                }
-                return bit;
-            };
-            var date = new Date(value);
-            var year = date.getFullYear();
-            var month = format(date.getMonth() + 1);
-            var day = format(date.getDate());
-            var hour = format(date.getHours());
-            var min = format(date.getMinutes());
-            var sec = format(date.getSeconds());
-            return `${year}-${month}-${day} ${hour}:${min}:${sec}`;
-        }
+        dateFormat
     }
 }
 </script>

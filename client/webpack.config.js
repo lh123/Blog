@@ -37,6 +37,9 @@ module.exports = {
             }
         ]
     },
+    externals:{
+        highlight:"hljs"
+    },
     devServer: {
         historyApiFallback: true,
         noInfo: true,

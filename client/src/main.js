@@ -5,7 +5,9 @@ import axios from "axios";
 
 axios.defaults.baseURL = "http://localhost:7000";
 
-import "./css/index.css";
+import "./assets/css/index.css";
+import "./assets/css/markdown.css";
+
 new Vue({
     el: "#app",
     router,

@@ -1,0 +1,84 @@
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown strong {
+    font-weight: 600;
+    color: #2c3e50;
+}
+.markdown a {
+    color: #42b983;
+    font-weight: 600;
+}
+.markdown p,
+.markdown ul,
+.markdown ol {
+    word-spacing: 0.05em;
+}
+.markdown em {
+    color: #7f8c8d;
+}
+
+.markdown pre {
+    padding: 1.2em 1.4em;
+    line-height: 1.5em;
+    margin: 0;
+    background-color: #f8f8f8;
+}
+
+.markdown code, .markdown pre {
+    font-family: 'Roboto Mono', Monaco, courier, monospace;
+    -webkit-font-smoothing: initial;
+    -moz-osx-font-smoothing: initial;
+    background-color: #f8f8f8;
+}
+.markdown pre>code {
+    font-size: 0.8em;
+    display: block;
+}
+.markdown code:after, .markdown code:before {
+    content: none;
+    letter-spacing: 0.05em;
+}
+.markdown h1 {
+    margin: 0 0 1em;
+}
+.markdown h2 {
+    margin: 45px 0 0.8em;
+    padding-bottom: 0.7em;
+    border-bottom: 1px solid #ddd;
+}
+.markdown h3 {
+    margin: 52px 0 1.2em;
+}
+.markdown figure,
+.markdown p,
+.markdown ul,
+.markdown ol {
+    margin: 1.2em 0;
+}
+.markdown p,
+.markdown ul,
+.markdown ol {
+    line-height: 1.6em;
+}
+.markdown ul,
+.markdown ol {
+    padding-left: 1.5em;
+}
+.markdown a {
+    color: #42b983;
+    font-weight: 600;
+}
+.markdown blockquote {
+    margin: 2em 0;
+    padding-left: 20px;
+    border-left: 4px solid #42b983;
+}
+.markdown blockquote p {
+    font-weight: 600;
+    margin-left: 0;
+}
+.markdown iframe {
+    margin: 1em 0;
+}

@@ -1,0 +1,105 @@
+body {
+    font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
+    margin: 0px;
+    font-size: 15px;
+}
+
+a {
+    text-decoration: none;
+    color: #34495e;
+}
+
+img {
+    border: none;
+}
+
+h1, h2, h3, h4, strong {
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+p {
+    word-spacing: 0.05em;
+}
+
+.content {
+    padding: 2.2em 0px;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.content .post {
+    padding: 1em 0 2em;
+    border-bottom: 1px solid #ddd;
+}
+
+.content h2 {
+    margin: 0.8em 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.content h4 {
+    color: #7f8c8d;
+    margin: 1.2em 0;
+}
+
+.content p, .content ul, .content ol {
+    line-height: 1.6em;
+    color: #34495e;
+}
+
+.content h2 a {
+    color: #2c3e50;
+    border-bottom: 2px solid #ddd;
+}
+
+.content h2 a:hover {
+    border-bottom: 2px solid #42b983;
+}
+
+.content a {
+    color: #42b983;
+    font-weight: 600;
+}
+
+.copy-right {
+    text-align: center;
+    padding: 8px;
+}
+
+.tag-list .tag {
+    float: left;
+    margin-bottom: 5px;
+    margin-left: 20px;
+}
+
+.tag-list .tag a.tag-link{
+    color: #7f8c8d;
+    border-bottom: 2px solid #7f8c8d;
+}
+
+.tag-list .tag a.tag-link:hover,
+.tag-list .tag a.tag-link.active{
+    border-bottom: 2px solid #42b983;
+}
+
+.fix::after,
+.fix::before{
+    overflow: hidden;
+    clear: both;
+    content: "clear";
+    height: 0px;
+    visibility: hidden;
+}
+
+@media screen and (max-width: 720px){
+    body {
+        -webkit-text-size-adjust: none;
+        font-size: 14px;
+    }
+
+    .content {
+        padding: 2em 1.4em 0;
+    }
+}
