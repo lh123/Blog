@@ -1,37 +1,14 @@
 <template>
     <div id="app">
-        <div class="left-nav">
-            <div class="logo">
-                <img src="./assets/img/logo.png" />
-            </div>
-            <div class="nav-icon" @click="onNavClick('posts')">
-                <img src="./assets/img/article.png" />
-            </div>
-            <div class="nav-icon" @click="onNavClick('tags')">
-                <img src="./assets/img/adminlabel.png" />
-            </div>
-            <div class="nav-icon" @click="onNavClick('user')">
-                <img src="./assets/img/use.png" />
-            </div>
-        </div>
-        <div class="content">
-             <transition name="fade" mode="out-in">
-                <router-view></router-view>
-            </transition> 
-        </div>
+        <transition name="fade" mode="out-in">
+            <router-view></router-view>
+        </transition>
     </div>
 </template>
 
 <script>
 export default {
-    name: "app",
-    created:function(){
-    },
-    methods: {
-        onNavClick: function (path) {
-            this.$router.push("/" + path);
-        }
-    }
+    name: "app"
 }
 </script>
 
@@ -41,6 +18,7 @@ export default {
     height: 100%;
 }
 
+/* 
 .left-nav {
     width: 90px;
     height: 100%;
@@ -77,5 +55,5 @@ export default {
     left: 0px;
     border-right: 1px solid #f1f1f1;
     background-color: #f8f8f8;
-}
+} */
 </style>

@@ -36,6 +36,10 @@ module.exports = {
             }
         ]
     },
+    externals: {
+        highlight: "hljs",
+        "SimpleMDE": "SimpleMDE"
+    },
     devServer: {
         historyApiFallback: true,
         noInfo: true,

@@ -12,9 +12,64 @@ body {
     font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
 }
 
+.fix::after,
+.fix::before {
+    clear: both;
+    visibility: hidden;
+    display: block;
+    height: 0px;
+    overflow: hidden;
+    content: "clear";
+}
+
+.content {
+    position: relative;
+    height: 100%;
+    width: calc(100% - 70px);
+    left: 70px;
+    top: 0;
+}
+
+.tag {
+    position: relative;
+    display: inline-block;
+    padding: 3px 0;
+    font-size: 14px;
+    color: #7f8c8d;
+    border-bottom: 2px solid #7f8c8d;
+    margin-top: 5px;
+    margin-right: 20px;
+}
+
+.tag.active,
+.tag:hover {
+    color: #42b983;
+    border-bottom: 2px solid #42b983;
+}
+
+.page-title {
+    color: #7f8c8d;
+    padding: 16px 16px 16px 25px;
+    font-weight: 400;
+}
+
+.list-item {
+    margin: 5px 25px;
+    border-bottom: 1px solid #ececec;
+}
+
+.out-side{
+    position: fixed;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+}
+
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .2s ease;
+    transition: opacity .2s ease;
 }
 .fade-enter, .fade-leave-active {
-  opacity: 0
+    opacity: 0
 }

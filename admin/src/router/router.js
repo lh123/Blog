@@ -1,8 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import PostList from "../components/PostList.vue";
-import PostEdit from "../components/PostEdit.vue";
-import TagList from "../components/Taglist.vue";
+import Posts from "../components/Posts.vue";
+import Tags from "../components/Tags.vue";
 import Login from "../components/Login.vue";
 import UserCenter from "../components/UserCenter.vue";
 import store from "../vuex/store";
@@ -14,25 +13,20 @@ Vue.use(VueRouter);
 var isRefeshToken = false;
 
 const router = new VueRouter({
+    linkActiveClass:"active",
     routes: [
         {
             path: "/", redirect: "/posts"
         },
         {
-            path: "/posts", component: PostList, meta: {
+            path: "/posts", component: Posts, meta: {
                 auth: true
-            },
-            children: [
-                { path: "edit", component: PostEdit, meta: { auth: true } }
-            ]
+            }
         },
         {
-            path: "/tags", component: TagList, meta: {
+            path: "/tags", component: Tags, meta: {
                 auth: true
-            },
-            children: [
-                { path: "posts", component: PostList }
-            ]
+            }
         },
         {
             path: "/user", component: UserCenter, meta: {

@@ -52,7 +52,9 @@ router.get("/draftsList", tokenVerify, function (req, res) {
     Draft.find(queryOpt).select("title user summary tags createTime lastModify article isPublish")
         .populate("tags")
         .sort({ lastModify: -1 })
-        .exec().catch(err => Promise.reject(new ApiError(500, "内部错误")))
+        .exec().catch(err => {
+            return Promise.reject(new ApiError(500, "内部错误"))
+        })
         .then(results => {
             let draftArr = [];
             if (results.length) {
@@ -92,7 +94,7 @@ router.post("/modifyDraft", tokenVerify, function (req, res) {
     var content = req.body.content;
     var user = req.body.user._id;
     var tags = req.body.tags;
-    var summary = "";
+    var summary;
     if (content) {
         let contentArr = content.split("<!-- more -->");
         if (contentArr.length > 1) {
