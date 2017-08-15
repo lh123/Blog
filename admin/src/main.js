@@ -12,7 +12,7 @@ import LoginApi from "./api/login";
 
 Vue.use(ElementUI);
 
-axios.defaults.baseURL = "http://server-1585086582.rhcloud.com";
+axios.defaults.baseURL = "http://localhost:7000";
 
 new Vue({
     el: "#app",

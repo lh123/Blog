@@ -1,7 +1,7 @@
 <template>
     <ul class="post-list">
-        <li v-for="item in postList" :key="item._id" class="post-list-item">
-            <div class="post" :class="[{'active':currentPostId === item._id},item.isPublish?'published':(item.article?'modified':'')]" @click="()=>$emit('updateId',item._id)">
+        <li v-for="item in postList" :key="item.id" class="post-list-item">
+            <div class="post" :class="[{'active':currentPostId === item.id},item.isPublish?'published':(item.article?'modified':'')]" @click="()=>$emit('updateId',item.id)">
                 <h3 class="post-title">{{item.title}}</h3>
                 <h6 class="post-time">{{item.lastModify | dateFormat}}</h6>
                 <p class="post-summary">{{item.summary}}</p>
@@ -20,7 +20,7 @@ export default {
             type: Array
         },
         currentPostId: {
-            type: String,
+            type: Number,
             required: true
         }
     },

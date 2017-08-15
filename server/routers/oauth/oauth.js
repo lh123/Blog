@@ -1,8 +1,9 @@
 var express = require("express");
-var User = require("../../models/user");
-var OAuth = require("../../models/auth");
 var crypto = require("crypto");
 var ApiError = require("../apierror");
+var userdao = require("../../db/userdao");
+var oauthdao = require("../../db/oauthdao");
+var utils = require("../../utils/index");
 
 var router = express.Router();
 
@@ -15,36 +16,17 @@ router.post("/register", function (req, res) {
         });
         return;
     }
-    var salt = crypto.randomBytes(16).toString("hex");
-    var user = new User();
-    user.username = username;
-    user.salt = salt;
-    user.password = crypto.createHash("md5").update(password + salt).digest("hex");
-    User.find({ username: username })
+    userdao.findByName(username)
         .then(function (data) {
             if (data.length == 0) {
-                return User.find({ isAdmin: true });
+                return userdao.insertUser(username, password);
             } else {
-                return Promise.reject(new ApiError(400, "用户已经存在"));
+                return Promise.reject(utils.ApiError(400, "用户已经存在"));
             }
-        })
-        .then(function (data) {
-            if (data.length == 0) {
-                user.isAdmin = true;
-            } else {
-                user.isAdmin = false;
-            }
-            return user.save();
         }).then(function (data) {
-            res.json({
-                code: 0,
-                msg: "success"
-            });
+            utils.sendSuccess(res, "success");
         }).catch(function (err) {
-            res.json({
-                code: err.code || 500,
-                msg: err.message
-            });
+            utils.sendError(res, err);
         });
 });
 
@@ -58,38 +40,21 @@ router.post("/login", function (req, res) {
         });
         return;
     }
-    User.findOne({ username: username })
-        .then(function (user) {
-            if (user == null) {
-                return Promise.reject(new ApiError(400, "用户不存在"));
+    userdao.findByName(username)
+        .then(users => {
+            if (users.length <= 0) {
+                return Promise.reject(utils.ApiError(400, "用户不存在"));
             }
-            var hashedPass = crypto.createHash("md5").update(password + user.salt).digest("hex");
+            let user = users[0];
+            let hashedPass = crypto.createHash("md5").update(password + user.salt).digest("hex");
             if (hashedPass === user.password) {
                 return Promise.resolve(user);
             } else {
-                return Promise.reject(new ApiError(400, "密码错误"))
+                return Promise.reject(utils.ApiError(400, "密码错误"))
             }
         })
         .then(function (user) {
-            var accessToken = crypto.createHash("md5").update(user.username + crypto.randomBytes(8)).digest("hex");
-            var refreshToken = crypto.createHash("md5").update(user.username + crypto.randomBytes(8)).digest("hex");
-            var oauth = {};
-            oauth.access_token = accessToken;
-            oauth.refresh_token = refreshToken;
-            var date = new Date();
-            date.setDate(date.getDate() + 1);
-            oauth.expires = date;
-            oauth.user_id = user._id;
-            return new Promise(function (resolve, reject) {
-                OAuth.findOneAndUpdate({ user_id: user._id }, oauth, { upsert: true })
-                    .then(function () {
-                        resolve({
-                            access_token: oauth.access_token,
-                            refresh_token: oauth.refresh_token,
-                            expires: oauth.expires
-                        });
-                    }).catch(err => reject(new ApiError(500, "内部错误")));
-            });
+            return oauthdao.createOrUpdateOauth(user.username, user.id);
         })
         .then(function (result) {
             res.json({
@@ -113,28 +78,23 @@ router.get("/refresh_token", function (req, res) {
             msg: "缺少refresh_token参数"
         });
     }
-    OAuth.findOne({ refresh_token: refresh_token })
-        .then(data => {
-            if (data == null) {
-                return Promise.reject(new ApiError(400, "refresh_token不存在"));
+    oauthdao.findByRefreshToken(refresh_token)
+        .then(oauths => {
+            if (oauths.length === 0) {
+                return Promise.reject(utils.ApiError(400, "refresh_token不存在"));
             } else {
-                return Promise.resolve(data._id);
+                return Promise.resolve(oauths[0]);
             }
         })
-        .then(id => {
-            var accessToken = crypto.randomBytes(16).toString("hex");
-            var refreshToken = crypto.randomBytes(16).toString("hex");
-            var date = new Date();
-            date.setDate(date.getDate() + 1);
-            return new Promise((resolve, reject) => {
-                OAuth.findByIdAndUpdate(id, { access_token: accessToken, refresh_token: refreshToken, expires: date })
-                    .then(() => resolve({
-                        access_token: accessToken,
-                        refresh_token: refreshToken,
-                        expires: date
-                    }))
-                    .catch(err => reject(err));
-            });
+        .then(oauth => {
+            return userdao.findById(oauth.user_id)
+                .then(user => {
+                    if (user) {
+                        return oauthdao.createOrUpdateOauth(user.username, user.id);
+                    } else {
+                        return Promise.reject(utils.ApiError(500, "内部错误"));
+                    }
+                })
         })
         .then(data => {
             res.json({

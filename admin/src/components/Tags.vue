@@ -17,7 +17,7 @@
                 <input class="edit-tag-input tag active" v-show="isTagEdit" v-model="newTagName" @keyup.enter="modifyTag" @blur="()=>isTagEdit = false">
             </div>
             <ul class="tag-list">
-                <li class="tag" v-for="tag in tags" :key="tag._id" v-show="tagActive===null || tag._id !== tagActive._id">
+                <li class="tag" v-for="tag in tags" :key="tag.id" v-show="tagActive===null || tag.id !== tagActive.id">
                     <span @click="searchTag(tag)">{{tag.name}}</span>
                 </li>
             </ul>
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="post-editor">
-            <post-editor v-if="currentPostId" :id="currentPostId" @titleModified="searchTag(tagActive)" @deletePost="searchTag(tagActive)" @publishPost="searchTag(tagActive)"></post-editor>
+            <post-editor v-if="currentPostId > 0" :id="currentPostId" @titleModified="searchTag(tagActive)" @deletePost="searchTag(tagActive)" @publishPost="searchTag(tagActive)"></post-editor>
         </div>
     </div>
 </template>
@@ -51,7 +51,7 @@ export default {
             newTagName: "",
             tags: [],
             postList: [],
-            currentPostId: ""
+            currentPostId: -1
         }
     },
     methods: {
@@ -66,7 +66,7 @@ export default {
             this.tagActive = tag;
             this.isTagEdit = false;
             this.newTagName = "";
-            DraftApi.getDraftList(tag._id)
+            DraftApi.getDraftList(tag.id)
                 .then(drafts => {
                     this.postList = drafts;
                 })
@@ -77,7 +77,7 @@ export default {
                 alert("没有选择标签");
                 return;
             }
-            TagApi.deleteTag(this.tagActive._id)
+            TagApi.deleteTag(this.tagActive.id)
                 .then(() => {
                     this.fetchData();
                     this.tagActive = null;
@@ -99,7 +99,7 @@ export default {
                 return;
             }
             this.isTagEdit = false;
-            TagApi.modifyTag(this.tagActive._id, this.newTagName)
+            TagApi.modifyTag(this.tagActive.id, this.newTagName)
                 .then(newTag => {
                     this.fetchData();
                     this.tagActive = newTag;

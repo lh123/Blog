@@ -34,6 +34,7 @@ import DraftApi from "../../api/draft";
 import TagApi from "../../api/tag";
 import SimpleMDE from "SimpleMDE";
 import { _debounce } from "../../utils/index";
+import "../../assets/css/markdown.css";
 
 const searchDebounce = _debounce(function (value) {
     TagApi.searchTag(value)
@@ -65,7 +66,7 @@ export default {
     name: "post-editor",
     props: {
         id: {
-            type: String,
+            type: Number,
             required: true
         }
     },
@@ -111,7 +112,7 @@ export default {
     },
     destroyed: function () {
         this.simplemde.toTextArea();
-        simplemde = null;
+        this.simplemde = null;
     },
     watch: {
         "id": function (id) {
@@ -145,6 +146,7 @@ export default {
                 TagApi.createTag(this.newTagName)
                     .then(tag => {
                         this.tags.push(tag);
+                        this.tagInput = false;
                         this.tagModified();
                     })
                     .catch(err => {
@@ -155,13 +157,13 @@ export default {
             }
         },
         deleteTag: function (id) {
-            this.tags.splice(this.tags.findIndex(value => value._id === id), 1);
+            this.tags.splice(this.tags.findIndex(value => value.id === id), 1);
             this.tagModified();
         },
         searchTag: searchDebounce,
         suggestTagClick: function (tag) {
             this.tagInput = false;
-            if (!this.tags.find(value => value._id === tag._id)) {
+            if (!this.tags.find(value => value.id === tag.id)) {
                 this.tags.push(tag);
                 this.tagModified();
             }
@@ -248,6 +250,7 @@ export default {
     font-size: 14px;
     color: #42b983;
     background: transparent;
+    z-index: 100;
 }
 
 .search-tag-list {
