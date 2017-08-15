@@ -10,7 +10,7 @@
         </div>
         <div class="post-editor">
             <transition name="fade" mode="out-in">
-                <post-editor v-if="currentPostId" :id="currentPostId" @titleModified="fetchData" @deletePost="fetchData" @publishPost="fetchData"></post-editor>
+                <post-editor v-if="currentPostId > 0" :id="currentPostId" @titleModified="fetchData" @deletePost="fetchData" @publishPost="fetchData"></post-editor>
             </transition>
         </div>
     </div>
@@ -25,7 +25,7 @@ export default {
     data: function () {
         return {
             postList: [],
-            currentPostId: ""
+            currentPostId: -1
         }
     },
     methods: {
@@ -39,7 +39,7 @@ export default {
         createPost: function () {
             DraftApi.createDraft("新文章")
                 .then(post => {
-                    this.currentPostId = post._id;
+                    this.currentPostId = post.id;
                     this.fetchData();
                 })
                 .catch(err => {

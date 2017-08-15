@@ -1,5 +1,6 @@
-var OAuth = require("../models/auth");
-var User = require("../models/user");
+var userdao = require("../db/userdao");
+var oauthdao = require("../db/oauthdao");
+var utils = require("../utils/index");
 var ApiError = require("../routers/apierror");
 
 var auth = function (req, res, next) {
@@ -10,29 +11,26 @@ var auth = function (req, res, next) {
             msg: "缺失access_token"
         });
     }
-    OAuth.findOne({ access_token })
-        .then(data => {
-            if (data == null) {
-                return Promise.reject(new ApiError(401, "access_token非法"));
+    oauthdao.findByAccessToken(access_token)
+        .then(oauth => {
+            if(oauth === undefined){
+                return Promise.reject(utils.ApiError(401, "access_token非法"));
             }
-            if (data.expires.getTime() < Date.now()) {
-                return Promise.reject(new ApiError(402, "access_token过期"));
+            if (oauth.expires.getTime() < Date.now()) {
+                return Promise.reject(utils.ApiError(402, "access_token过期"));
             }
-            return User.findById(data.user_id);
+            return userdao.findById(oauth.user_id);
         })
         .then(user => {
-            if (user == null) {
-                return Promise.reject(new ApiError(500, "内部错误"));
+            if (!user) {
+                return Promise.reject(utils.ApiError(500, "内部错误"));
             } else {
                 req.body.user = user;
-                next();
+                return next();
             }
         })
         .catch(err => {
-            res.json({
-                code: err.code || 500,
-                msg: err.message
-            });
+            utils.sendError(res,err);
         });
 };
 

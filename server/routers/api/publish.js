@@ -1,10 +1,11 @@
 "use strict"
 
 var express = require("express");
-var Article = require("../../models/article");
-var Draft = require("../../models/draft");
-var utils = require("../../utils/index");
 var tokenVerify = require("../../middleware/tokenVerify");
+
+var draftdao = require("../../db/draftdao");
+var articledao = require("../../db/articledao");
+var utils = require("../../utils/index");
 
 var router = express.Router();
 
@@ -20,7 +21,8 @@ var router = express.Router();
 
 router.post("/publish", tokenVerify, function (req, res) {
     const draftId = req.query.draftId;
-    Draft.findOne({ _id: draftId }).exec().catch(err => Promise.reject(utils.ApiError(500, "内部错误")))
+    var user = req.body.user;
+    draftdao.findDraftById(draftId)
         .then(draft => {
             if (draft) {
                 return Promise.resolve(draft);
@@ -42,50 +44,35 @@ router.post("/publish", tokenVerify, function (req, res) {
         })
         .then(draft => {
             if (draft.article) {
-                draft.isPublish = true;
-                draft.lastModify = Date.now();
-                const articleOption = {
+                const article = {
                     title: draft.title,
-                    user: draft.user,
+                    user: user.id,
                     content: draft.content,
                     summary: draft.summary,
                     tags: draft.tags
                 };
-                var article = {};
-                return new Promise(function (resolve, reject) {
-                    Promise.all([
-                        draft.save().catch(err => Promise.reject(utils.ApiError(500, "内部错误"))),
-                        Article.findByIdAndUpdate(draft.article, { "$set": articleOption }, { new: true }).populate("tags").exec()
-                            .catch(err => Promise.reject(utils.ApiError(500, "内部错误")))
-                            .then(result => {
-                                article = result
-                            })
-                    ]).catch(err => reject(err)).then(() => resolve(article));
-                });
+                return articledao.modify(article, draft.article)
+                    .then(() => {
+                        return draftdao.modify({ isPublish: true, lastModify: new Date() }, draftId);
+                    });
             } else {
-                draft.isPublish = true;
-                draft.lastModify = Date.now();
-                const articleOption = {
+                const article = {
                     title: draft.title,
-                    user: draft.user,
-                    createTime: Date.now(),
+                    user: user.id,
+                    createTime: new Date(),
                     content: draft.content,
                     summary: draft.summary,
                     tags: draft.tags,
                     hidden: false,
                     visits: 0,
                 };
-                var article = new Article(articleOption);
-                return article.save().catch(err => Promise.reject(utils.ApiError(500, "内部错误")))
-                    .then(result => {
-                        article = result;
-                        draft.article = result._id;
-                        return draft.save().catch(err => Promise.reject(utils.ApiError(500, "内部错误")));
-                    })
-                    .then(() => Promise.resolve(article));
+                return articledao.createArticle(article.title, article.user, article.content, article.summary, article.tags)
+                    .then(articleId => {
+                        return draftdao.modify({ article: articleId, isPublish: true, lastModify: new Date() }, draftId);
+                    });
             }
         })
-        .then(article => utils.sendSuccess(res, article))
+        .then(() => utils.sendSuccess(res))
         .catch(err => utils.sendError(res, err));
 });
 

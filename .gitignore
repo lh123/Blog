@@ -3,3 +3,4 @@ admin/dist
 client/dist
 .vscode
 *.bat
+server/db/config/*

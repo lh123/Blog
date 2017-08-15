@@ -14,7 +14,7 @@ function sendError(res, errOrCode, msg) {
         });
     } else {
         res.json({
-            code,
+            errOrCode,
             msg
         });
     }
