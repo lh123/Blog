@@ -10,10 +10,8 @@ import LoginApi from "../api/login";
 
 Vue.use(VueRouter);
 
-var isRefeshToken = false;
-
 const router = new VueRouter({
-    linkActiveClass:"active",
+    linkActiveClass: "active",
     routes: [
         {
             path: "/", redirect: "/posts"
@@ -40,13 +38,6 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    if (!isRefeshToken && store.state.refresh_token) {
-        isRefeshToken = true;
-        LoginApi.refreshToken()
-            .then(() => next())
-            .catch((err) => next({ path: "/login", query: { redirect: to.fullPath } }));
-        return;
-    }
     if (to.meta.auth) {
         if (store.state.access_token && store.state.refresh_token) {
             next();

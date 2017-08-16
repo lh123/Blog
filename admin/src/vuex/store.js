@@ -36,6 +36,9 @@ var mutations = {
         state.access_token = "";
         state.refresh_token = "";
         state.expires = "";
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("expires");
     }
 }
 

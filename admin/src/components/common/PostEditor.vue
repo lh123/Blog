@@ -19,9 +19,9 @@
                 </div>
             </div>
             <div class="post-btn-container">
-                <button type="button" class="btn btn-save right" @click="publishPost">发布文章</button>
-                <button type="button" v-show="isModified" class="btn btn-save right" @click="savePost">保存草稿</button>
-                <button type="button" class="btn btn-delete right" @click="deletePost">删除草稿</button>
+                <button type="button" class="btn btn-primary right" @click="publishPost">发布文章</button>
+                <button type="button" v-show="isModified" class="btn btn-primary right" @click="savePost">保存草稿</button>
+                <button type="button" class="btn btn-danger right" @click="deletePost">删除草稿</button>
             </div>
         </div>
         <div class="editor-container">
@@ -289,6 +289,10 @@ export default {
     box-sizing: border-box;
     padding: 15px;
     min-width: 178px;
+}
+
+.post-btn-container .btn {
+    margin: 0px 5px;
 }
 
 .right {

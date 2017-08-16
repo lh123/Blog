@@ -5,7 +5,7 @@
             <h3 class="blog-title">
                 博客介绍
             </h3>
-            <button type="button" class="btn btn-save" @click="saveInfo">保存</button>
+            <button type="button" class="btn btn-primary" @click="saveInfo">保存</button>
             <textarea id="editor"></textarea>
         </div>
     </div>
@@ -74,7 +74,6 @@ export default {
     position: absolute;
     top: 12px;
     right: 16px;
-    width: 50px;
 }
 
 .blog-title {

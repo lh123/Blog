@@ -68,22 +68,60 @@ body {
 }
 
 .btn {
-    border-radius: 5px;
+    border-radius: 4px;
     box-sizing: border-box;
-    padding: 8px;
-    font-size: 10px;
-    border: none;
-    color: white;
-    margin: 0 5px;
+    font-size: 14px;
+    background: #fff;
+    border: 1px solid #bfcbd9;
+    border-color: #c4c4c4;
+    color: #1f2d3d;
+    padding: 10px 15px;
+    line-height: 1;
+    white-space: nowrap;
+    outline: none;
     cursor: pointer;
+    display: inline-block;
+    text-align: center;
 }
 
-.btn-save {
+.btn-primary {
     background-color: #42b983;
+    border-color: #42b983;
+    color: #fff;
 }
 
-.btn-delete {
-    background-color: #ff6666;
+.btn-primary:hover {
+    background-color: #5BBC8F;
+    border-color: #5BBC8F;
+    color: #fff;
+}
+
+.btn-danger {
+    background-color: #ff4949;
+    border-color: #ff4949;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #ff6d6d;
+    border-color: #ff6d6d;
+    color: #fff;
+}
+
+.input-normal {
+    border: 1px solid #bfcbd9;
+    border-radius: 4px;
+    box-sizing: border-box;
+    height: 36px;
+    outline: none;
+    padding: 3px 10px;
+    background-color: #ffffff;
+    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+}
+
+.input-normal:focus {
+    outline: none;
+    border-color: #42b983;
 }
 
 .fade-enter-active, .fade-leave-active {

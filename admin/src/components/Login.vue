@@ -1,17 +1,19 @@
 <template>
     <div class="login-wrapper">
-        <el-form label-width="100px">
-            <el-form-item label="用户名" prop="pass">
-                <el-input type="text" v-model="username" auto-complete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="密码" prop="checkPass">
-                <el-input type="password" v-model="password" auto-complete="off"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="submitForm">登录</el-button>
-                <el-button @click="resetForm">重置</el-button>
-            </el-form-item>
-        </el-form>
+        <form>
+            <div class="form-item">
+                <label>用户名</label>
+                <input type="text" v-model="username" class="input-normal">
+            </div>
+            <div class="form-item">
+                <label>密码</label>
+                <input type="password" v-model="password" class="input-normal">
+            </div>
+            <div class="form-item btn-group">
+                <button class="btn btn-primary" @click="submitForm">登录</button>
+                <button class="btn btn-danger" @click="resetForm">重置</button>
+            </div>
+        </form>
     </div>
 </template>
 
@@ -27,30 +29,26 @@ export default {
     methods: {
         submitForm: function () {
             if (!this.username || !this.password) {
-                this.$message({
-                    message: "用户名和密码不能为空",
-                    type: "error"
-                });
+                alert("用户名和密码不能为空");
                 return;
             }
             LoginApi.login(this.username, this.password)
                 .then(() => {
-                    this.$message({
-                        message: "登陆成功",
-                        type: "success"
-                    });
+                    alert("登陆成功");
                     var to = this.$route.query.redirect;
-                    this.$router.push(to);
+                    if (to) {
+                        this.$router.push(to);
+                    }else{
+                        this.$router.push("/");
+                    }
                 })
                 .catch(err => {
-                    this.$message({
-                        message: err.message,
-                        type: "error"
-                    });
+                    alert(err.message);
                 });
         },
         resetForm: function () {
-            
+            this.username = "";
+            this.password = "";
         }
     }
 }
@@ -65,7 +63,21 @@ export default {
     align-items: center;
 }
 
-.login-wrapper>.el-form {
-    width: 400px;
+form .form-item {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+form .btn-group {
+    text-align: center;
+}
+
+form .btn-group .btn {
+    margin: 0px 10px;
+}
+
+.login-wrapper label {
+    display: inline-block;
+    width: 60px;
 }
 </style>

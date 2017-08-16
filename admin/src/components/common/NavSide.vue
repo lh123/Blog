@@ -21,7 +21,7 @@
             </ul>
             <ul class="bottom-menu">
                 <li>
-                    <a class="nav-link">
+                    <a class="nav-link" @click="loginOut">
                         <i class="fa fa-sign-out"></i>
                     </a>
                 </li>
@@ -30,8 +30,16 @@
     </div>
 </template>
 <script>
+import store from "../../vuex/store";
+import { LOGIN_OUT } from "../../vuex/types";
 export default {
-    name: "nav-side"
+    name: "nav-side",
+    methods: {
+        loginOut: function () {
+            store.commit(LOGIN_OUT);
+            this.$router.push("/login");
+        }
+    }
 }
 </script>
 <style>
