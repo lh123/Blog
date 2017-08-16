@@ -3,8 +3,4 @@ admin/dist
 client/dist
 .vscode
 *.bat
-<<<<<<< HEAD
 server/db/config/*
-=======
-server/db/config/*
->>>>>>> 09064dea75377d4c683627e1bd8976d27100c5b4
