@@ -3,7 +3,7 @@ import VueRouter from "vue-router";
 import Posts from "../components/Posts.vue";
 import Tags from "../components/Tags.vue";
 import Login from "../components/Login.vue";
-import UserCenter from "../components/UserCenter.vue";
+import Blog from "../components/Blog.vue";
 import store from "../vuex/store";
 
 import LoginApi from "../api/login";
@@ -29,7 +29,7 @@ const router = new VueRouter({
             }
         },
         {
-            path: "/user", component: UserCenter, meta: {
+            path: "/user", component: Blog, meta: {
                 auth: true
             }
         },

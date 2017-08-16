@@ -2,7 +2,7 @@ var crypto = require("crypto");
 var pool = require("./pool");
 
 var sql = {
-    insert: "draft",
+    insert: "insert into oauth (access_token,refresh_token,user_id,expires) values (?,?,?,?)",
     update: "update oauth set access_token=?,refresh_token=?,expires=? where id=?",
     delete: "delete from oauth where id=?",
     queryByUserId: "select * from oauth where user_id=?",
@@ -19,6 +19,7 @@ function createOauth(username, userId) {
         expires.setDate(expires.getDate() + 7);
         pool.query(sql.insert, [accessToken, refreshToken, userId, expires], (err, results) => {
             if (err) {
+                console.error(err.stack);
                 reject(err);
             } else {
                 reslove({

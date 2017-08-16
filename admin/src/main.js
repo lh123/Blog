@@ -12,6 +12,7 @@ import LoginApi from "./api/login";
 
 Vue.use(ElementUI);
 
+// axios.defaults.baseURL = "http://blog-server.azurewebsites.net";
 axios.defaults.baseURL = "http://localhost:7000";
 
 new Vue({

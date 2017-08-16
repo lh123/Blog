@@ -5,16 +5,16 @@
                 All Tags
             </h2>
             <p class="fix tag-container tag-list">
-                <span class="tag" v-for="tag in tags" :key="tag._id">
-                    <a href="javascript:;" @click="tagClick(tag._id)" class="tag-link" :class="{active:currentTagId===tag._id}">{{tag.name}}</a>
+                <span class="tag" v-for="tag in tags" :key="tag.id">
+                    <a href="javascript:;" @click="tagClick(tag.id)" class="tag-link" :class="{active:currentTagId===tag.id}">{{tag.name}}</a>
                 </span>
             </p>
         </div>
         <div class="post-list">
             <ul>
-                <li v-for="article in articles" :key="article._id">
+                <li v-for="article in articles" :key="article.id">
                     <h4>
-                        <router-link :to="'/posts/'+article._id">{{article.title}}&nbsp;</router-link>
+                        <router-link :to="'/posts/'+article.id">{{article.title}}&nbsp;</router-link>
                         <span>&nbsp;{{article.createTime | dateFormat}}</span>
                     </h4>
                 </li>
