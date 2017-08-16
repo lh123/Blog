@@ -3,7 +3,7 @@ import store from "../vuex/store";
 import { LOGIN_SUCCESS, LOGIN_OUT, LOGIN_FAIL } from "../vuex/types";
 
 var login = function (username, password) {
-    return axios.post("/oauth/login", { username, password })
+    return axios.post("/api/login", { username, password })
         .catch(err => Promise.reject(new Error("网络错误")))
         .then(res => {
             if (res.status === 200) {
@@ -25,7 +25,7 @@ var login = function (username, password) {
 }
 
 var refreshToken = function () {
-    return axios.get("/oauth/refresh_token?refresh_token=" + store.state.refresh_token)
+    return axios.get("/api/refresh_token?refresh_token=" + store.state.refresh_token)
         .catch(err => Promise.reject(new Error("网络错误")))
         .then(res => {
             if (res.status === 200) {
