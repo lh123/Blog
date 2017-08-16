@@ -9,7 +9,7 @@ import { LOGIN_SUCCESS } from "./vuex/types";
 import LoginApi from "./api/login";
 
 // axios.defaults.baseURL = "http://blog-server.azurewebsites.net";
-axios.defaults.baseURL = "http://localhost:7000";
+// axios.defaults.baseURL = "http://localhost:7000";
 
 new Vue({
     el: "#app",
