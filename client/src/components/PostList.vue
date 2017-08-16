@@ -1,14 +1,14 @@
 <template>
     <div class="post-list">
-        <div class="post" v-for="post in posts" :key="post._id">
+        <div class="post" v-for="post in posts" :key="post.id">
             <h2>
-                <router-link :to="'/posts/' + post._id">{{post.title}}</router-link>
+                <router-link :to="'/posts/' + post.id">{{post.title}}</router-link>
             </h2>
             <h4>{{post.createTime | dateFormat}}</h4>
             <div class="markdown">
                 <p v-html="markdown(post.summary)"></p>
             </div>
-            <router-link :to="'/posts/' + post._id">... continue reading</router-link>
+            <router-link :to="'/posts/' + post.id">... continue reading</router-link>
         </div>
         <page-nav @onPreClick="prePage" @onNextClick="nextPage" :havePre="currentPage>0" :haveNext="totalPage !== null && totalPage !== undefined && (currentPage<totalPage-1)"></page-nav>
     </div>

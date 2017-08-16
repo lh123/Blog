@@ -56,16 +56,32 @@ router.post("/createArticle", tokenVerify, function (req, res) {
 });
 
 router.get("/articleList", function (req, res) {
-    utils.sendError(res,500,"todo");
+    var tagId = req.query.tag;
+    if (tagId) {
+        articledao.findArticleByTag(tagId)
+            .then(articles => {
+                utils.sendSuccess(res, articles);
+            })
+            .catch(err => utils.sendError(res, err));
+    } else {
+        var page = parseInt(req.query.page || 0);
+        var limit = parseInt(req.query.limit || 10);
+        var skip = page * limit;
+        articledao.findAllArticle(-1, skip, limit)
+            .then(articles => {
+                utils.sendSuccess(res, articles);
+            })
+            .catch(err => utils.sendError(res, err));
+    }
 });
 
 router.get("/articleDetail", function (req, res) {
     const id = req.query.id;
     articledao.findArticleById(id)
         .then(article => {
-            utils.sendSuccess(res,article)
+            utils.sendSuccess(res, article)
         })
-        .catch(err => utils.sendError(res,err));
+        .catch(err => utils.sendError(res, err));
 });
 
 // router.post("/modifyArticle", tokenVerify, function (req, res) {

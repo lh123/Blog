@@ -10,7 +10,7 @@
         </div>
         <div class="post-editor">
             <transition name="fade" mode="out-in">
-                <post-editor v-if="currentPostId > 0" :id="currentPostId" @titleModified="fetchData" @deletePost="fetchData" @publishPost="fetchData"></post-editor>
+                <post-editor v-if="currentPostId > 0" :id="currentPostId" @postSave="fetchData" @deletePost="fetchData" @publishPost="fetchData"></post-editor>
             </transition>
         </div>
     </div>
@@ -38,8 +38,8 @@ export default {
         },
         createPost: function () {
             DraftApi.createDraft("新文章")
-                .then(post => {
-                    this.currentPostId = post.id;
+                .then(id => {
+                    this.currentPostId = id;
                     this.fetchData();
                 })
                 .catch(err => {

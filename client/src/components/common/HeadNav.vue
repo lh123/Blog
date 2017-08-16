@@ -24,6 +24,7 @@
                 <a class="menu" @click="menuClick"></a>
                 <a class="logo"></a>
             </nav>
+            <div v-if="isSlideOpen" class="nav-masker" @click="maskClick"></div>
             <div class="sidebar" :class="{open:isSlideOpen}">
                 <ul class="sidebar-menu" @click="itemClick">
                     <li>
@@ -37,6 +38,7 @@
                     </li>
                 </ul>
             </div>
+    
         </header>
     </div>
 </template>
@@ -55,6 +57,9 @@ export default {
         },
         itemClick: function () {
             this.isSlideOpen = !this.isSlideOpen;
+        },
+        maskClick: function () {
+            this.isSlideOpen = false;
         }
     }
 }
@@ -63,6 +68,7 @@ export default {
 <style>
 .top-nav-container {
     display: block;
+    box-shadow: 0 0 4px rgba(0, 0, 0, .25);
 }
 
 .top-nav {
@@ -175,6 +181,14 @@ export default {
     margin-bottom: 20px;
     list-style-type: none;
     line-height: 1.8em;
+}
+
+.nav-masker {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
 }
 
 @media screen and (max-width: 720px) {

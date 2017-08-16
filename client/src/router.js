@@ -4,6 +4,7 @@ import Vue from "vue";
 import PostList from "./components/PostList.vue";
 import PostDetail from "./components/PostDetail.vue";
 import TagList from "./components/TagList.vue";
+import Me from "./components/Me.vue";
 
 Vue.use(VueRouter);
 
@@ -21,6 +22,9 @@ const router = new VueRouter({
         },
         {
             path: "/tags", component: TagList
+        },
+        {
+            path: "/about", component: Me
         }
     ]
 });

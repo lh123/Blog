@@ -17,9 +17,9 @@ var getBlogInfo = function () {
         });
 };
 
-var saveBlogInfo = function (title, describe) {
+var saveBlogInfo = function (content) {
     var access_token = store.state.access_token;
-    return axios.post("/api/saveBlogInfo", { title, describe }, { params: { access_token } })
+    return axios.post("/api/saveBlogInfo", { content }, { params: { access_token } })
         .catch(err => Promise.reject(new Error("网络错误")))
         .then(res => {
             if (res.status === 200) {

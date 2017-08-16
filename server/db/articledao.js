@@ -5,7 +5,8 @@ var sql = {
     insert: "insert into article (title,user,content,summary,createTime,lastModify) values (?,?,?,?,?,?)",
     delete: "delete from article where id=?",
     queryById: "select d.id,d.title,d.content,d.summary,d.createTime,d.lastModify,u.username as user from article as d join user as u on d.user=u.id where d.id = ?",
-    queryAll: "select d.id,d.title,d.content,d.summary,d.createTime,d.lastModify,u.username as user from article as d join user as u on d.user=u.id"
+    queryAll: "select d.id,d.title,d.content,d.summary,d.createTime,d.lastModify,u.username as user from article as d join user as u on d.user=u.id",
+    count: "select count(*) as count from article"
 };
 
 function createArticle(title, user, content, summary, tags) {
@@ -70,21 +71,46 @@ function createArticle(title, user, content, summary, tags) {
         })
 }
 
-function findAllArticle(order) {
+function findAllArticle(order, skip, limit) {
     return new Promise((resolve, reject) => {
         var sqlstr = sql.queryAll;
         if (order > 0) {
-            sqlstr += " order by d.lastModify asc";
+            sqlstr += " order by d.createTime asc";
         } else {
-            sqlstr += " order by d.lastModify desc";
+            sqlstr += " order by d.createTime desc";
         }
+        skip = skip || 0;
+        limit = limit || 10;
+        sqlstr += " limit " + skip + "," + limit;
         pool.query(sqlstr, (err, results) => {
             if (err) {
                 return reject(err);
             } else {
-                return resolve(results);
+                var articles = results;
+                pool.query(sql.count, (err, results) => {
+                    if (err) {
+                        return reject(err);
+                    } else {
+                        return resolve({
+                            articles,
+                            total: results[0].count
+                        })
+                    }
+                })
             }
         });
+    });
+}
+
+function findArticleByTag(tagId) {
+    return new Promise((resolve, reject) => {
+        var sqlstr = "select d.id,d.title,d.content,d.summary,d.createTime,d.lastModify,u.username as user from article as d join user as u on d.user=u.id where d.id in (select aid from article_tag_links where tid=?) order by d.createTime desc";
+        pool.query(sqlstr, tagId, (err, results) => {
+            if (err) {
+                return reject(err);
+            }
+            return resolve(results);
+        })
     });
 }
 
@@ -247,7 +273,7 @@ function addTag(aid, tid) {
 
 function getAllTag(aid) {
     return new Promise((resolve, reject) => {
-        pool.query("select tid as id from article_tag_links where aid=?", [aid], (err, results) => {
+        pool.query("select b.id,b.name from article_tag_links as a join tag as b on a.tid=b.id where a.aid=?", [aid], (err, results) => {
             if (err) {
                 return reject(err);
             } else {
@@ -260,6 +286,7 @@ function getAllTag(aid) {
 module.exports = {
     createArticle,
     findAllArticle,
+    findArticleByTag,
     findArticleById,
     modify,
     deleteArticle

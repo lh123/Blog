@@ -1,7 +1,7 @@
 <template>
     <div class="post-editor-container">
         <div class="input-title-container">
-            <input type="text" class="post-title-input" placeholder="请输入标题" v-model="postTitle" @input="titleModified">
+            <input type="text" class="post-title-input" placeholder="请输入标题" v-model="postTitle" @input="()=>isModified = true">
         </div>
         <div class="post-toolbar fix">
             <div class="tag-container">
@@ -12,14 +12,15 @@
                 <div class="tag-add-container">
                     <span class="tag active" v-show="!tagInput" @click="beginAddTag">+</span>
                     <input type="text" v-show="tagInput" class="tag-input" v-model="newTagName" placeholder="请用回车提交新Tag" @keyup.enter="addNewTag">
+                    <span class="tag active" v-show="tagInput" @click="()=>tagInput=false">取消</span>
                     <ul class="search-tag-list" v-show="searchedTags.length>0 && tagInput">
                         <li class="search-tag-item" v-for="tag in searchedTags" :key="tag._id" @click="suggestTagClick(tag)">{{tag.name}}</li>
                     </ul>
-                    <div class="out-side" v-show="searchedTags.length>0 && tagInput" @click="()=>tagInput = false"></div>
                 </div>
             </div>
             <div class="post-btn-container">
                 <button type="button" class="btn btn-save right" @click="publishPost">发布文章</button>
+                <button type="button" v-show="isModified" class="btn btn-save right" @click="savePost">保存草稿</button>
                 <button type="button" class="btn btn-delete right" @click="deletePost">删除草稿</button>
             </div>
         </div>
@@ -44,23 +45,23 @@ const searchDebounce = _debounce(function (value) {
         .catch(err => console.log(err));
 }, 500);
 
-const titleChangeDebounce = _debounce(function () {
-    DraftApi.saveDraft(this.id, this.postTitle, undefined, undefined)
-        .then(() => this.$emit("titleModified"))
-        .catch(err => alert(err));
-}, 500);
+// const titleChangeDebounce = _debounce(function () {
+//     DraftApi.saveDraft(this.id, this.postTitle, undefined, undefined)
+//         .then(() => this.$emit("titleModified"))
+//         .catch(err => alert(err));
+// }, 500);
 
-const contentChangeDebounce = _debounce(function () {
-    DraftApi.saveDraft(this.id, undefined, this.content, undefined)
-        .then(() => this.$emit("contentModified"))
-        .catch(err => alert(err));
-}, 500);
+// const contentChangeDebounce = _debounce(function () {
+//     DraftApi.saveDraft(this.id, undefined, this.content, undefined)
+//         .then(() => this.$emit("contentModified"))
+//         .catch(err => alert(err));
+// }, 500);
 
-const tagChangeDebounce = _debounce(function (value) {
-    DraftApi.saveDraft(this.id, undefined, undefined, this.tags)
-        .then(() => this.$emit("tagModified"))
-        .catch(err => alert(err));
-}, 500);
+// const tagChangeDebounce = _debounce(function (value) {
+//     DraftApi.saveDraft(this.id, undefined, undefined, this.tags)
+//         .then(() => this.$emit("tagModified"))
+//         .catch(err => alert(err));
+// }, 500);
 
 export default {
     name: "post-editor",
@@ -80,7 +81,7 @@ export default {
             searchedTags: [],
             simplemde: null,
             isChangedByUser: false,
-            saveCount: 0
+            isModified: false
         }
     },
     computed: {
@@ -107,7 +108,7 @@ export default {
                 self.isChangedByUser = true;
                 return;
             }
-            self.contentModified(self.content);
+            this.isModified = true;
         });
     },
     destroyed: function () {
@@ -134,9 +135,9 @@ export default {
                 })
                 .catch(err => alert(err));
         },
-        titleModified: titleChangeDebounce,
-        contentModified: contentChangeDebounce,
-        tagModified: tagChangeDebounce,
+        // titleModified: titleChangeDebounce,
+        // contentModified: contentChangeDebounce,
+        // tagModified: tagChangeDebounce,
         beginAddTag: function () {
             this.tagInput = true;
             this.newTagName = "";
@@ -147,7 +148,7 @@ export default {
                     .then(tag => {
                         this.tags.push(tag);
                         this.tagInput = false;
-                        this.tagModified();
+                        this.isModified = true;
                     })
                     .catch(err => {
                         alert(err);
@@ -158,23 +159,27 @@ export default {
         },
         deleteTag: function (id) {
             this.tags.splice(this.tags.findIndex(value => value.id === id), 1);
-            this.tagModified();
+            this.isModified = true;
         },
         searchTag: searchDebounce,
         suggestTagClick: function (tag) {
             this.tagInput = false;
             if (!this.tags.find(value => value.id === tag.id)) {
                 this.tags.push(tag);
-                this.tagModified();
+                this.isModified = true;
             }
         },
         publishPost: function () {
-            if (!this.id) {
-                alert("文章正在保存，请稍后重试");
-                return;
-            }
             DraftApi.publishDraft(this.id)
                 .then(() => this.$emit("publishPost"))
+                .catch(err => alert(err));
+        },
+        savePost: function () {
+            DraftApi.saveDraft(this.id, this.postTitle, this.content, this.tags)
+                .then(() => {
+                    this.isModified = false;
+                    this.$emit("postSave");
+                })
                 .catch(err => alert(err));
         },
         deletePost: function () {
@@ -284,25 +289,6 @@ export default {
     box-sizing: border-box;
     padding: 15px;
     min-width: 178px;
-}
-
-.btn {
-    border-radius: 5px;
-    box-sizing: border-box;
-    padding: 8px;
-    font-size: 10px;
-    border: none;
-    color: white;
-    margin: 0 5px;
-    cursor: pointer;
-}
-
-.btn-save {
-    background-color: #42b983;
-}
-
-.btn-delete {
-    background-color: #ff6666;
 }
 
 .right {

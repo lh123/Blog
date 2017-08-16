@@ -67,6 +67,25 @@ body {
     top: 0px;
 }
 
+.btn {
+    border-radius: 5px;
+    box-sizing: border-box;
+    padding: 8px;
+    font-size: 10px;
+    border: none;
+    color: white;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.btn-save {
+    background-color: #42b983;
+}
+
+.btn-delete {
+    background-color: #ff6666;
+}
+
 .fade-enter-active, .fade-leave-active {
     transition: opacity .2s ease;
 }
