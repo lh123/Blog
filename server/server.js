@@ -1,12 +1,7 @@
 var express = require("express");
 var bodyParser = require("body-parser");
-var mongoose = require("mongoose");
 
 var port = process.env.PORT || 7000;
-
-mongoose.Promise = global.Promise;
-// mongoose.connect("mongodb://localhost:27017/db", { useMongoClient: true });
-
 var app = express();
 
 app.use(bodyParser.urlencoded());
