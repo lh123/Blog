@@ -55,10 +55,10 @@ export default {
                 .catch(err => alert(err));
         },
         goPreArticle: function () {
-            this.$router.push("/posts/" + this.preArticle._id);
+            this.$router.push("/posts/" + this.preArticle.id);
         },
         goNextArticle: function () {
-            this.$router.push("/posts/" + this.nextArticle._id);
+            this.$router.push("/posts/" + this.nextArticle.id);
         }
     },
     watch: {

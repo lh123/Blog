@@ -152,7 +152,7 @@ function findArticleById(id) {
 function findPreOrNextArticle(opt, id) {
     return new Promise((resolve, reject) => {
         var sql = undefined;
-        if (opt === "pre") {
+        if (opt === "next") {
             sql = "select id,title from article where id<? order by createTime desc limit 1";
         } else {
             sql = "select id,title from article where id>? limit 1";

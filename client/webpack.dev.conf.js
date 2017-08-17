@@ -1,18 +1,17 @@
 const path = require("path");
 const webpack = require("webpack");
 const HtmlPlugin = require("html-webpack-plugin");
-
-var publicPath = "/";
-var assetsSubPath = "static";
+const utils = require("./utils");
 
 module.exports = {
-    entry: "./src/main.js",
+    entry: {
+        app: "./src/main.js"
+    },
     devtool: "source-map",
     output: {
-        path: path.resolve(__dirname, "./dist"),
-        publicPath,
-        filename: path.join(assetsSubPath, "js/[name].[hash].js"),
-        chunkFilename: path.join(assetsSubPath, "js/[id].[hash].js")
+        path: utils.assetsRoot,
+        publicPath: utils.publicPath,
+        filename: "[name].js"
     },
     module: {
         rules: [
@@ -23,7 +22,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 loader: "babel-loader",
-                include: path.resolve(__dirname, "src")
+                include: utils.resolvePath("src")
             },
             {
                 test: /\.css$/,
@@ -33,14 +32,14 @@ module.exports = {
                 test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
                 loader: 'file-loader',
                 options: {
-                    name: path.join(assetsSubPath, "fonts/[name].[hash].[ext]")
+                    name: utils.assetsPath("fonts/[name].[ext]")
                 }
             },
             {
                 test: /\.(png|jpe?g|gif|svg)(\?\S*)?$/,
                 loader: 'file-loader',
-                options: {
-                    name: path.join(assetsSubPath, "imgs/[name].[hash].[ext]")
+                query: {
+                    name: utils.assetsPath("imgs/[name].[ext]")
                 }
             }
         ]
@@ -50,14 +49,9 @@ module.exports = {
     },
     plugins: [
         new HtmlPlugin({
-            filename: path.resolve(__dirname, "dist/index.html"),
-            template: path.resolve(__dirname, "index.html"),
+            filename: utils.resolvePath("dist/index.html"),
+            template: utils.resolvePath("index.html"),
             inject: true
         })
-    ],
-    devServer: {
-        historyApiFallback: true,
-        noInfo: true,
-        inline: true
-    },
+    ]
 };
