@@ -1,6 +1,6 @@
 <template>
     <div class="login-wrapper">
-        <form @submit="submitForm">
+        <form @submit.prevent="submitForm">
             <div class="form-item">
                 <label>用户名</label>
                 <input type="text" v-model="username" class="input-normal">

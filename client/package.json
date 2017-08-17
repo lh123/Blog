@@ -30,7 +30,7 @@
     "webpack-dev-server": "^2.7.1"
   },
   "scripts": {
-    "build": "webpack --config webpack.prod.conf.js",
+    "build": "set NODE_ENV=production && webpack --config webpack.prod.conf.js",
     "server": "webpack-dev-server --config webpack.dev.conf.js"
   },
   "author": "",

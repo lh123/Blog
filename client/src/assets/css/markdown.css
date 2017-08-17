@@ -24,6 +24,7 @@
     line-height: 1.5em;
     margin: 0;
     background-color: #f8f8f8;
+    overflow: auto;
 }
 
 .markdown code, .markdown pre {

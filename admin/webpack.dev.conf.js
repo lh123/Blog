@@ -1,7 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const HtmlPlugin = require("html-webpack-plugin");
-const utils = require("./utils");
+const { config, utils } = require("./webpack-helper")
 
 module.exports = {
     entry: {
@@ -9,8 +9,8 @@ module.exports = {
     },
     devtool: "source-map",
     output: {
-        path: utils.assetsRoot,
-        publicPath: utils.publicPath,
+        path: config.dev.assetsRoot,
+        publicPath: config.dev.publicPathDev,
         filename: "[name].js"
     },
     module: {

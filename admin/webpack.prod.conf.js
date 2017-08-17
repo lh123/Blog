@@ -3,7 +3,7 @@ const webpack = require("webpack");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HtmlPlugin = require("html-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
-const utils = require("./utils");
+const { config, utils } = require("./webpack-helper")
 
 module.exports = {
     entry: {
@@ -12,8 +12,8 @@ module.exports = {
     },
     devtool: "source-map",
     output: {
-        path: utils.assetsRoot,
-        publicPath: utils.publicPath,
+        path: config.build.assetsRoot,
+        publicPath: config.build.publicPath,
         filename: utils.assetsPath("js/[name].[chunkhash].js"),
         chunkFilename: utils.assetsPath("js/[id].[chunkhash].js")
     },
