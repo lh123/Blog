@@ -77,7 +77,7 @@ module.exports = {
             filename: utils.assetsPath("css/[name].[chunkhash].css")
         }),
         new HtmlPlugin({
-            filename: utils.assetsPath("index.html"),
+            filename: utils.resolvePath("dist/index.html"),
             template: utils.resolvePath("index.html"),
             inject: true
         })
