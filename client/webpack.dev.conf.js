@@ -1,12 +1,18 @@
 const path = require("path");
 const webpack = require("webpack");
+const HtmlPlugin = require("html-webpack-plugin");
+
+var publicPath = "/";
+var assetsSubPath = "static";
+
 module.exports = {
     entry: "./src/main.js",
     devtool: "source-map",
     output: {
         path: path.resolve(__dirname, "./dist"),
-        publicPath: "/dist/",
-        filename: "build.js"
+        publicPath,
+        filename: path.join(assetsSubPath, "js/[name].[hash].js"),
+        chunkFilename: path.join(assetsSubPath, "js/[id].[hash].js")
     },
     module: {
         rules: [
@@ -17,29 +23,38 @@ module.exports = {
             {
                 test: /\.js$/,
                 loader: "babel-loader",
-                exclude: /node_modules/
+                include: path.resolve(__dirname, "src")
             },
             {
                 test: /\.css$/,
-                loader: 'style-loader!css-loader'
+                loader: "style-loader!css-loader"
             },
             {
                 test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
-                loader: 'file-loader'
+                loader: 'file-loader',
+                options: {
+                    name: path.join(assetsSubPath, "fonts/[name].[hash].[ext]")
+                }
             },
             {
                 test: /\.(png|jpe?g|gif|svg)(\?\S*)?$/,
                 loader: 'file-loader',
-                query: {
-                    name: 'img/[name].[ext]?[hash]'
+                options: {
+                    name: path.join(assetsSubPath, "imgs/[name].[hash].[ext]")
                 }
             }
         ]
     },
     externals: {
-        highlight: "hljs",
-        "SimpleMDE": "SimpleMDE"
+        highlight: "hljs"
     },
+    plugins: [
+        new HtmlPlugin({
+            filename: path.resolve(__dirname, "dist/index.html"),
+            template: path.resolve(__dirname, "index.html"),
+            inject: true
+        })
+    ],
     devServer: {
         historyApiFallback: true,
         noInfo: true,
