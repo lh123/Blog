@@ -70,7 +70,7 @@ module.exports = {
         }),
         new CopyPlugin([{
             from: utils.resolvePath("static"),
-            to: utils.resolvePath("dist")
+            to: utils.resolvePath("dist/static")
         }]),
         new ExtractTextPlugin({
             filename: utils.assetsPath("css/[name].[chunkhash].css")

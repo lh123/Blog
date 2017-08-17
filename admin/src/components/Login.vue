@@ -1,6 +1,6 @@
 <template>
     <div class="login-wrapper">
-        <form>
+        <form @submit="submitForm">
             <div class="form-item">
                 <label>用户名</label>
                 <input type="text" v-model="username" class="input-normal">
@@ -10,7 +10,7 @@
                 <input type="password" v-model="password" class="input-normal">
             </div>
             <div class="form-item btn-group">
-                <button class="btn btn-primary" @click="submitForm">登录</button>
+                <button type="submit" class="btn btn-primary">登录</button>
                 <button class="btn btn-danger" @click="resetForm">重置</button>
             </div>
         </form>

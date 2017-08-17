@@ -8,7 +8,7 @@ const utils = require("./utils");
 module.exports = {
     entry: {
         app: "./src/main.js",
-        vendor: ["vue", "vue-router", "axios", "marked"]
+        vendor: ["vue", "vuex", "vue-router", "axios", "marked"]
     },
     devtool: "source-map",
     output: {
@@ -71,7 +71,7 @@ module.exports = {
         }),
         new CopyPlugin([{
             from: utils.resolvePath("static"),
-            to: utils.resolvePath("dist")
+            to: utils.resolvePath("dist/static")
         }]),
         new ExtractTextPlugin({
             filename: utils.assetsPath("css/[name].[chunkhash].css")

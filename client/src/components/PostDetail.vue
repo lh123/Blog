@@ -63,7 +63,7 @@ export default {
     },
     watch: {
         "$route": function (to, from) {
-            if (to.path.match(/^\/posts\/\w{24}$/)) {
+            if (to.path.match(/^\/posts\/\d+?$/)) {
                 this.fetchData();
             }
         }
