@@ -30,6 +30,10 @@ body {
     top: 0;
 }
 
+.content img {
+    max-width: 100%;
+}
+
 .tag {
     position: relative;
     display: inline-block;
